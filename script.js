@@ -776,6 +776,11 @@ function refreshSelected() {
         
         $('#selected_sitedist').text(format_distance_long(selected.sitedist));
         $('#selected_rssi').text(selected.rssi.toFixed(1) + ' dBFS');
+
+	console.log(selected);
+	if(selected.altitude != null && selected.position != null) {
+		postSelected(selected.altitude, selected.position);
+	}
 }
 
 // Refreshes the larger table of all the planes
@@ -1015,4 +1020,16 @@ function loadJSON(callback) {
 		}
 	};
 	xobj.send(null);
+}
+
+function postSelected(alt, pos) {
+	var palt = alt;
+	var plat = pos[1];
+	var plon = pos[0];
+	$.post("http://192.168.0.120:5010/selected-plane",
+		{ "alt": palt, "lat": plat, "lon": plon },
+		function(data, status){
+			console.log(status);
+		}
+	);
 }
