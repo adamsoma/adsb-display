@@ -127,6 +127,7 @@
 					<table style="width: 100%">
 						<tr class="infoblock_heading">
 							<td colspan="2">
+								<span id="sometext">Flight/Tail #:</span>
 								<b>
 									<span id="selected_callsign" onclick="toggleFollowSelected();" class="pointer">n/a</span>
 								</b>
@@ -206,8 +207,12 @@
 				<div id="demo_table">
 					<table id="demo_button_table" style="width: 100%">
 						<tr>
-							<td style="text-align: center">Normal Mode</td>
-							<td style="text-align: center">Demo Mode</td>
+							<td style="text-align: center">
+								<button onclick="setDemoMode()">Demo Mode</button>
+							</td>
+							<td style="text-align: center">
+								<button onclick="setNormalMode()">Normal Mode</button>
+							</td>
 						</tr>
 					</table>
 				</div>

@@ -1,6 +1,7 @@
 from flask import Flask, request
 from geographiclib.geodesic import Geodesic
 import math
+import time
 
 geod = Geodesic.WGS84
 
@@ -27,8 +28,41 @@ def selected_plane():
 
     print(arm_azi, arm_deg)
 
-    return ''
+    #send_data(arm_azi, arm_deg)
 
+    return ''''''
+
+
+def send_data(bearing, angle):
+    #print(socket.gethostname())
+    #TCP_IP = '10.42.0.240'
+    #TCP_PORT = 5008
+    #BUFFER_SIZE = 64
+
+    #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    #s.bind((TCP_IP, TCP_PORT))
+    #s.listen(1)
+
+    #conn1, addr = s.accept()
+#    s.listen(1)
+#    bearing_temp = "b" + str(bearing)
+#    angle_temp = "p" + str(angle)
+#    data_b = str.encode(bearing_temp)
+#    data_a = str.encode(angle_temp)
+    msg = "b" + str(bearing) + "p" + str(angle) + "x"
+    data_c = str.encode(msg)
+    #print("received data:", data_b)
+    #print("received data:", data_a)
+    print("sent data:", data_c)
+#    conn1.send(data_b)
+#    time.sleep(.2)
+#    conn1.send(data_a)
+    conn1.send(data_c)
+    print('Connection address:', addr)
+    #print("connection address:", addr)
+    #conn1.close()
+    #s.close()
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5010)
+    app.run(debug=False, host="0.0.0.0", port=5020)

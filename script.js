@@ -10,6 +10,9 @@ var Planes        = {};
 var PlanesOrdered = [];
 var SelectedPlane = null;
 var FollowSelected = false;
+var DemoData;
+var DemoTimer;
+var DemoInc;
 
 var SpecialSquawks = {
         '7500' : { cssClass: 'squawk7500', markerColor: 'rgb(255, 85, 85)', text: 'Aircraft Hijacking' },
@@ -41,6 +44,8 @@ var MessageCountHistory = [];
 var MessageRate = 0;
 
 var NBSP='\u00a0';
+
+var OperationMode = "NORMAL";
 
 function processReceiverUpdate(data) {
 	// Loop through all the planes in the data packet
@@ -230,6 +235,7 @@ function initialize() {
 		document.getElementById("altitude_text").innerHTML = sys_JSON.altitude;
 	});*/
 	getJSON();
+	loadDemoData();
 }
 
 var CurrentHistoryFetch = null;
@@ -778,7 +784,7 @@ function refreshSelected() {
         $('#selected_rssi').text(selected.rssi.toFixed(1) + ' dBFS');
 
 	console.log(selected);
-	if(selected.altitude != null && selected.position != null) {
+	if(selected.altitude != null && selected.position != null && OperationMode == "NORMAL") {
 		postSelected(selected.altitude, selected.position);
 	}
 }
@@ -1010,6 +1016,24 @@ function getJSON() {
 	setTimeout(getJSON, 30000);
 }
 
+function loadDemoData() {
+	loadCSV(function(response) {
+		DemoData = JSON.parse(response);
+	});
+}
+
+function loadCSV(callback) {
+	var xobj = new XMLHttpRequest();
+	xobj.overrideMimeType("application/json");
+	xobj.open('GET', 'demo_data.json', true);
+	xobj.onreadystatechange = function () {
+		if(xobj.readyState == 4 && xobj.status == "200") {
+			callback(xobj.responseText);
+		}
+	};
+	xobj.send(null);
+}
+
 function loadJSON(callback) {
 	var xobj = new XMLHttpRequest();
 	xobj.overrideMimeType("application/json");
@@ -1026,10 +1050,39 @@ function postSelected(alt, pos) {
 	var palt = alt;
 	var plat = pos[1];
 	var plon = pos[0];
-	$.post("http://192.168.0.120:5010/selected-plane",
+	$.post("http://192.168.137.138:5025/selected-plane",
 		{ "alt": palt, "lat": plat, "lon": plon },
 		function(data, status){
 			console.log(status);
 		}
 	);
+}
+
+function setDemoMode() {
+	OperationMode = "DEMO";
+	DemoInc = 0;
+	DemoTimer = setInterval(runDemo, 1400);
+}
+
+function setNormalMode() {
+	OperationMode = "NORMAL";
+	clearInterval(DemoTimer);
+}
+
+function runDemo() {
+	if(DemoInc >= 240) {
+		DemoInc = 0;
+	}
+
+	if(OperationMode == "DEMO"){
+		console.log(DemoData[DemoInc].lat);
+		$.post("http://192.168.137.138:5025/selected-plane",
+			{ "alt": 315, "lat": DemoData[DemoInc].lat, "lon": DemoData[DemoInc].lon },
+			function(data, status) {
+				console.log(status);
+			}
+		);
+	}
+	DemoInc = DemoInc + 2;
+
 }
